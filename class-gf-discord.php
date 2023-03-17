@@ -1028,20 +1028,20 @@ class GF_Discord extends GFFeedAddOn {
 			}
 		}
 
-		// Add the user id as a fact
-		if ( $user_id ) {
-			$facts[] = [
-				'name'  => 'User ID:',
-				'value' => $user_id,
-				'inline' => true
-			];
-		}
-
         // Add the source url as a fact
 		if ( isset( $feed[ 'meta' ][ 'source_url' ] ) && $feed[ 'meta' ][ 'source_url' ] ) {
 			$facts[] = [
 				'name'  => 'Source URL:',
 				'value' => $entry[ 'source_url' ],
+				'inline' => true
+			];
+		}
+
+		// Add the user id as a fact
+		if ( isset( $feed[ 'meta' ][ 'user_id' ] ) && $feed[ 'meta' ][ 'user_id' ] && $user_id ) {
+			$facts[] = [
+				'name'  => 'User ID:',
+				'value' => $user_id,
 				'inline' => true
 			];
 		}
