@@ -119,27 +119,9 @@ class GF_Discord extends GFFeedAddOn {
 			GFCache::set( 'gfdisc_plugin_settings', $plugin_settings );
 		}
 
-		// Add the media uploader script
-		// TODO: Will work on this for next version
-		// add_action( 'admin_enqueue_scripts', [ $this, 'media_uploader' ] );
-
 		// Add a meta box to the entries
         add_filter( 'gform_entry_detail_meta_boxes', [ $this, 'entry_meta_box' ], 10, 3 );
 	} // End init()
-
-
-	/**
-	 * Media uploader script
-	 *
-	 * @return void
-	 */
-	// public function media_uploader() {
-	// 	if ( is_admin() ) {
-	// 		wp_enqueue_media();
-	// 		wp_register_script( 'gfdisc-media-uploader-js', GFDISC_PLUGIN_DIR.'media-uploader.js', [ 'jquery' ], '1.0.1', true );
-	// 		wp_enqueue_script( 'gfdisc-media-uploader-js' );
-	// 	}
-	// } // End media_uploader()
 
 
 	/**
@@ -147,25 +129,24 @@ class GF_Discord extends GFFeedAddOn {
 	 *
 	 * @return array
 	 */
-	// public function scripts() {
-	// 	$scripts = [
-	// 		[
-	// 			'handle'    => 'gf_gfdisc_media_uploader',
-	// 			'src'       => GFDISC_PLUGIN_DIR.'media-uploader.js',
-	// 			'version'   => $this->_version,
-	// 			'deps'      => [ 'jquery' ],
-	// 			'in_footer' => true,
-	// 			'enqueue'   => [
-	// 				[
-	// 					// 'admin_page' => [ 'plugin_page' ],
-	// 					// 'tab'        => 'gf-discord',
-	// 					'query' => 'page=gf_settings&subview='.GFDISC_TEXTDOMAIN
-	// 				],
-	// 			],
-	// 		],
-	// 	];
-	// 	return array_merge( parent::scripts(), $scripts );
-	// } // End scripts()
+	public function scripts() {
+		$scripts = [
+			[
+				'handle'    => 'gf_gfdisc_media_uploader',
+				'src'       => GFDISC_PLUGIN_DIR.'media-uploader.js',
+				'version'   => $this->_version,
+				'deps'      => [ 'jquery' ],
+				'callback'  => 'wp_enqueue_media',
+				'in_footer' => true,
+				'enqueue'   => [
+					[
+						'query' => 'page=gf_settings&subview='.GFDISC_TEXTDOMAIN
+					],
+				],
+			],
+		];
+		return array_merge( parent::scripts(), $scripts );
+	} // End scripts()
 
 
 	/**
@@ -180,7 +161,7 @@ class GF_Discord extends GFFeedAddOn {
         // Link to Debug Form and Entry
         if ( !isset( $meta_boxes[ 'gfdisc' ] ) ) {
             $meta_boxes[ 'gfdisc' ] = [
-                'title'         => esc_html__( 'Discord', 'gravityforms' ),
+                'title'         => esc_html__( 'Discord', 'gf-discord' ),
                 'callback'      => [ $this, 'entry_meta_box_content' ],
                 'context'       => 'side',
                 'callback_args' => [ $entry, $form ],
@@ -363,19 +344,18 @@ class GF_Discord extends GFFeedAddOn {
 						'default_value' 	=> GFDISC_PLUGIN_DIR.'img/wordpress-logo.png',
 						'feedback_callback' => [ $this, 'validate_image' ],
                     ],
-					// [
-					// 	'name'              => 'upload_image_button',
-					// 	'type'              => 'media_upload',
-					// 	'class'             => 'medium',
-					// 	'args'  => [
-                    //         'button' => [
-                    //             // 'label'   => esc_html__( '', 'gf-discord' ),
-                    //             'name'    => 'upload_image_button',
-					// 			'class'   => 'button',
-					// 			'value'   => 'Upload Image'
-					// 		],
-					// 	],
-                    // ],
+					[
+						'name'              => 'upload_image_button',
+						'type'              => 'media_upload',
+						'class'             => 'medium',
+						'args'  => [
+                            'button' => [
+                                'name'    => 'upload_image_button',
+								'class'   => 'button',
+								'value'   => 'Upload Image'
+							],
+						],
+                    ],
 					[
 						'name'              => 'gfdisc_preview',
 						'type'              => 'gfdisc_preview',
@@ -648,6 +628,13 @@ class GF_Discord extends GFFeedAddOn {
 						'tooltip'  => esc_html__( 'Add the Incoming Webhook URL. You will find this in your Discord Incoming Webhook App setup.', 'gf-discord' ),
 					],
 					[
+						'name'     => 'bot_name',
+						'label'    => esc_html__( 'Override Bot Name (Optional)', 'gf-discord' ),
+						'type'     => 'text',
+						'required' => false,
+						'tooltip'  => esc_html__( 'Use a different bot name than the default one you created on your Discord webhook settings.', 'gf-discord' ),
+					],
+					[
 						'name'     => 'channel',
 						'label'    => esc_html__( 'Channel Name (Optional)', 'gf-discord' ),
 						'type'     => 'text',
@@ -656,11 +643,17 @@ class GF_Discord extends GFFeedAddOn {
 					],
 					[
 						'name'          => 'color',
-						'label'         => esc_html__( 'Accent Color', 'gf-discord' ),
+						'label'         => esc_html__( 'Accent Color (Optional)', 'gf-discord' ),
 						'type'          => 'text',
 						'required'      => false,
 						'tooltip'       => esc_html__( 'Choose a color for the top bar of the messages using a hex code. Default is red (#FF0000).', 'gf-discord' ),
 						'default_value' => '#FF0000',
+					],
+					[
+						'name'    => 'message',
+						'label'   => esc_html__( 'Message (Optional) — Discord Formatting/Markdown is Allowed', 'gf-discord' ),
+						'type'    => 'textarea',
+						'class'   => 'medium merge-tag-support mt-position-right',
 					],
 					[
 						'name'  	=> 'top_section_footer',
@@ -750,8 +743,8 @@ class GF_Discord extends GFFeedAddOn {
 		// Add CSS
 		echo '</pre>
 		<style>
-		#gform-settings-section-discord-integration-settings .gform-settings-panel__content { 
-			border-top: 3px solid '.esc_attr( $color ).' !important; 
+		#gform-settings-section-feed-settings { 
+			border-left: 5px solid '.esc_attr( $color ).' !important; 
 		}
 		</style>';
 
@@ -926,7 +919,7 @@ class GF_Discord extends GFFeedAddOn {
 			$hiding = false;
 		}
 
-        // Store the messsage facts
+        // Store the message facts
         $facts = [];
 
         // Iter the fields
@@ -950,15 +943,26 @@ class GF_Discord extends GFFeedAddOn {
 
             // Store the value here
             $value = '';
+              
+            // Consent fields
+            if ( $field->type == 'consent' ) {
 
-            // Check if the field type is a survey
-            if ( $field->type == 'survey' ) {
+                // If they selected the consent checkbox
+                if ( isset( $entry[ $field_id ] ) && $entry[ $field_id ] == 1 ) {
+                    $value = 'True';
+                }
+
+			// Checkbox
+            } elseif ( $field->type == 'checkbox' ) {
                 
-                // Get the choices
+				// Get the choices
+                $value = $this->get_gf_checkbox_values( $form, $entry, $field_id );
+            
+            // Radio/survey/select
+            } elseif ( $field->type != 'quiz' && $field->choices && !empty( $field->choices ) ) {
+                
+				// Get the choices
                 $choices = $field->choices;
-
-                // Store selected
-                $selected = 0;
 
                 // Iter the choices
                 foreach ( $choices as $choice ) {
@@ -966,25 +970,10 @@ class GF_Discord extends GFFeedAddOn {
                     // Get the choice
                     if ( strpos( $entry[ $field_id ], $choice[ 'value' ] ) !== false ) {
 
-                        // Increase selected
-                        $selected++;
-
                         // Get the value
                         $value = $choice[ 'text' ];
                     }
                 }
-              
-            // Consent fields
-            } elseif ( $field->type == 'consent' ) {
-
-                // If they selected the consent checkbox
-                if ( isset( $entry[ $field_id ] ) && $entry[ $field_id ] == 1 ) {
-                    $value = 'True';
-                }
-            
-            // Quiz questions
-            } elseif ( $field->type != 'quiz' && $field->choices && !empty( $field->choices ) ) {
-                $value = self::get_gf_checkbox_values( $form, $entry, $field_id );
 
 			// Otherwise just return the field value    
             } elseif ( $field->type == 'name' ) {
@@ -1003,8 +992,8 @@ class GF_Discord extends GFFeedAddOn {
             // Add the fact
 			if ( !$hiding || ( $hiding && $value != '' ) ) {
 				$facts[] = [
-					'name'  => $label,
-					'value' => $value
+					'name'   => $label,
+					'value'  => $value,
 				];
 			}
 
@@ -1043,7 +1032,8 @@ class GF_Discord extends GFFeedAddOn {
 		if ( $user_id ) {
 			$facts[] = [
 				'name'  => 'User ID:',
-				'value' => $user_id
+				'value' => $user_id,
+				'inline' => true
 			];
 		}
 
@@ -1051,14 +1041,13 @@ class GF_Discord extends GFFeedAddOn {
 		if ( isset( $feed[ 'meta' ][ 'source_url' ] ) && $feed[ 'meta' ][ 'source_url' ] ) {
 			$facts[] = [
 				'name'  => 'Source URL:',
-				'value' => $entry[ 'source_url' ]
+				'value' => $entry[ 'source_url' ],
+				'inline' => true
 			];
 		}
 
         // Put the message args together
         $args = [
-            'form_id'  => $form[ 'id' ],
-            'entry_id' => $entry[ 'id' ],
 			'user_id'  => $user_id,
             'email'    => $email,
 			'webhook'  => $feed[ 'meta' ][ 'webhook' ],
@@ -1066,7 +1055,7 @@ class GF_Discord extends GFFeedAddOn {
         ];
 
         // Send the message
-        if ( $this->send_msg( $args, $facts, $feed ) ) {
+        if ( $this->send_msg( $args, $facts, $form, $entry, $feed ) ) {
 
             // Return true
             return true;
@@ -1084,8 +1073,8 @@ class GF_Discord extends GFFeedAddOn {
      *
      * @return void
      */
-    public function send_msg( $args, $facts, $feed ) {
-        // Get the site name
+    public function send_msg( $args, $facts, $form, $entry, $feed  ) {
+		// Get the site name
 		$get_site_name = sanitize_text_field( $this->get_plugin_setting( 'site_name' ) );
         if ( $get_site_name && $get_site_name != '' ) {
             $site_name = $get_site_name;
@@ -1117,66 +1106,57 @@ class GF_Discord extends GFFeedAddOn {
             return false;
         }
 
+		// Get the message
+		$get_message = sanitize_textarea_field( $feed[ 'meta' ][ 'message' ] );
+        if ( $get_message && $get_message != '' ) {
+			$message = GFCommon::replace_variables( $get_message, $form, $entry, false, true, false, 'text' );
+        } else {
+            $message = '';
+        }
+
         // Get the accent color
 		$color = $this->sanitize_and_validate_color( $feed[ 'meta' ][ 'color' ], $this->default_accent_color );
 
 		// Message data
         $data = [
-            // Text-to-speech
             'tts' => false,
-
-            // File upload
             // 'file' => '',
+			// 'content' => esc_html( $args[ 'msg' ] ),
+			// 'avatar_url' => esc_url( $args[ 'bot_avatar_url' ] ),
         ];
 
-        // Message
-        // $data[ 'content' ] = esc_html( $args[ 'msg' ] );
-
-        // Change name of bot; default is DevDebugTools
-        // $data[ 'username' ] = esc_html( $args[ 'bot_name'] );
-
-        // Change bot avatar url
-        // $data[ 'avatar_url' ] = esc_url( $args[ 'bot_avatar_url' ] );
+		// Override the bot name
+		$get_bot_name = sanitize_text_field( $feed[ 'meta' ][ 'bot_name' ] );
+        if ( $get_bot_name && $get_bot_name != '' ) {
+            $data[ 'username' ] = $get_bot_name;
+        }
 
         // Embed
         $data[ 'embeds' ] = [
 			[
-				// Embed Type
-				'type' => 'rich',
-
-				// Embed left border color in HEX
-				'color' => hexdec( $color ),
+				'type'        => 'rich',
+				'color'       => hexdec( $color ),
+				'author'      => [
+					'name'       => $site_name,
+					'url'        => home_url()
+				],
+				'title'       => $title,
+				'url'         => admin_url( 'admin.php?page=gf_entries&view=entry&id='.$args[ 'form_id' ].'&lid='.$args[ 'entry_id' ] ),
+				'description' => $message,
+				'fields'      => $facts,
+				'image'       => [
+					'url'        => ''
+				],
+				'thumbnail'   => [
+					'url'        => $image
+				],
+				'footer'      => [
+					'text'       => home_url().' Test 3',
+					'icon_url'   => GFDISC_PLUGIN_DIR.'img/wordpress-logo.png'
+				],
+				'timestamp'   => $this->convert_timezone( date( 'Y-m-d H:i:s', strtotime( $args[ 'date' ] ) ), 'c' ),
 			]
 		];
-
-		// Footer
-		$data[ 'embeds' ][0][ 'footer' ] = [
-			'text' => home_url(),
-			'icon_url' => GFDISC_PLUGIN_DIR.'img/wordpress-logo.png'
-		];
-		$data[ 'embeds' ][0][ 'timestamp' ] = $this->convert_timezone( date( 'Y-m-d H:i:s', strtotime( $args[ 'date' ] ) ), 'c' );
-
-		// Embed author
-		$data[ 'embeds' ][0][ 'author' ][ 'name' ] = $site_name;
-		$data[ 'embeds' ][0][ 'author' ][ 'url' ] = home_url();
-
-		// Embed title
-		$data[ 'embeds' ][0][ 'title' ] = $title;
-
-		// Embed title link
-		$data[ 'embeds' ][0][ 'url' ] = admin_url( 'admin.php?page=gf_entries&view=entry&id='.$args[ 'form_id' ].'&lid='.$args[ 'entry_id' ] );
-
-		// Embed description
-		// $data[ 'embeds' ][0][ 'description' ] = '';
-
-		// Embed description
-		$data[ 'embeds' ][0][ 'fields' ] = $facts;
-
-		// Embed attached image
-		// $data[ 'embeds' ][0][ 'image' ][ 'url' ] = $image;
-
-		// Embed thumbnail
-		$data[ 'embeds' ][0][ 'thumbnail' ][ 'url' ] = $image;
 
         // Encode
         $json_data = json_encode( $data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
