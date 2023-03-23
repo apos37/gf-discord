@@ -60,6 +60,35 @@ class GF_Discord_Bootstrap {
 
 
 /**
+ * Filter plugin action links
+ */
+add_filter( 'plugin_row_meta', 'gfdisc_plugin_row_meta' , 10, 2 );
+
+
+/**
+ * Add links to our website and Discord support
+ *
+ * @param array $links
+ * @return array
+ */
+function gfdisc_plugin_row_meta( $links, $file ) {
+    // Only apply to this plugin
+    if ( GFDISC_TEXTDOMAIN.'/'.GFDISC_TEXTDOMAIN.'.php' == $file ) {
+
+        // Add the link
+        $row_meta = [
+            // 'docs' => '<a href="'.esc_url( 'https://apos37.com/' ).'" target="_blank" aria-label="'.esc_attr__( 'Plugin Website Link', 'gf-discord' ).'">'.esc_html__( 'Website', 'gf-discord' ).'</a>',
+            'discord' => '<a href="'.esc_url( 'https://discord.gg/VeMTXRVkm5' ).'" target="_blank" aria-label="'.esc_attr__( 'Plugin Support on Discord', 'gf-discord' ).'">'.esc_html__( 'Discord Support', 'gf-discord' ).'</a>'
+        ];
+        return array_merge( $links, $row_meta );
+    }
+
+    // Return the links
+    return (array) $links;
+} // End plugin_row_meta()
+
+
+/**
  * Add string comparison function to earlier versions of PHP
  *
  * @param string $haystack

@@ -190,49 +190,62 @@ class GF_Discord extends GFFeedAddOn {
 		// Start the container
         $results = '<div>';
 
-		// If there are feeds
-		if ( !empty( $feeds ) ) {
+		// Check for a wp error
+		if ( !is_wp_error( $feeds ) ) {
 
-			// Send the form entry if query string says so
-			if ( isset( $_GET[ 'gfdisc' ] ) && sanitize_text_field( $_GET[ 'gfdisc' ] )  == 'true' &&
-				 isset( $_GET[ 'feed_id' ] ) && absint( $_GET[ 'feed_id' ] ) != '' ) {
+			// If there are feeds
+			if ( !empty( $feeds ) ) {
 
-				// The feed id
-				$feed_id = absint( $_GET[ 'feed_id' ] );
+				// Send the form entry if query string says so
+				if ( isset( $_GET[ 'gfdisc' ] ) && sanitize_text_field( $_GET[ 'gfdisc' ] )  == 'true' &&
+					isset( $_GET[ 'feed_id' ] ) && absint( $_GET[ 'feed_id' ] ) != '' ) {
 
-				// Get the feed
-				$feed = GFAPI::get_feed( $feed_id );
+					// The feed id
+					$feed_id = absint( $_GET[ 'feed_id' ] );
 
-				// Process the feed
-				$this->process_feed( $feed, $entry, $form );
+					// Get the feed
+					$feed = GFAPI::get_feed( $feed_id );
 
-				// Remove the query strings
-			    $this->redirect_without_qs( [ 'gfdisc', 'feed_id' ] );
-			}
+					// Process the feed
+					$this->process_feed( $feed, $entry, $form );
 
-			// Multiple feeds?
-			if ( count( $feeds ) > 1 ) {
-				$br = '<br><br>';
+					// Remove the query strings
+					$this->redirect_without_qs( [ 'gfdisc', 'feed_id' ] );
+				}
+
+				// Multiple feeds?
+				if ( count( $feeds ) > 1 ) {
+					$br = '<br><br>';
+				} else {
+					$br = '';
+				}
+
+				// Iter the feeds
+				foreach ( $feeds as $feed ) {
+
+					// The feed title
+					$results .= '<strong><a href="'.$this->feed_settings_url( $form[ 'id' ], $feed[ 'id' ] ).'">'.$feed[ 'meta' ][ 'feedName' ].'</a>:</strong><br><br>';
+
+					// The current url
+					$current_url = '/wp-admin/admin.php?page=gf_entries&view=entry&id='.$form[ 'id' ].'&lid='.$entry[ 'id' ];
+
+					// Resend button
+					$results .= '<a class="button" href="'.$current_url.'&feed_id='.$feed[ 'id' ].'&gfdisc=true">Resend</a>';
+
+					// Space between
+					$results .= $br;
+				}
+
 			} else {
-				$br = '';
-			}
 
-			// Iter the feeds
-			foreach ( $feeds as $feed ) {
-
-				// The feed title
-				$results .= '<strong><a href="'.$this->feed_settings_url( $form[ 'id' ], $feed[ 'id' ] ).'">'.$feed[ 'meta' ][ 'feedName' ].'</a>:</strong><br><br>';
-
-				// The current url
-				$current_url = '/wp-admin/admin.php?page=gf_entries&view=entry&id='.$form[ 'id' ].'&lid='.$entry[ 'id' ];
+				// The feed url
+				$feed_url = '/wp-admin/admin.php?page=gf_edit_forms&view=settings&subview='.GFDISC_TEXTDOMAIN.'&id='.$form[ 'id' ];
 
 				// Resend button
-				$results .= '<a class="button" href="'.$current_url.'&feed_id='.$feed[ 'id' ].'&gfdisc=true">Resend</a>';
-
-				// Space between
-				$results .= $br;
+				$results .= '<a class="button" href="'.$feed_url.'">Add New Feed</a>';
 			}
 
+		// Error
 		} else {
 
 			// The feed url
@@ -240,7 +253,6 @@ class GF_Discord extends GFFeedAddOn {
 
 			// Resend button
 			$results .= '<a class="button" href="'.$feed_url.'">Add New Feed</a>';
-			
 		}
         
         // Start the container
@@ -1018,7 +1030,7 @@ class GF_Discord extends GFFeedAddOn {
         }
 
 		// Last resort user id
-		if ( $email && $email != '' && $user_id == 0 ) {
+		if ( $email && $email != '' && ( !$user_id || $user_id == 0 || $user_id == '' ) ) {
 			
 			// Attempt to find user by email
 			if ( $user = get_user_by( 'email', $email ) ) {
