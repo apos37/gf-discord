@@ -373,6 +373,15 @@ class GF_Discord extends GFFeedAddOn {
 						'type'              => 'gfdisc_preview',
 						'class'             => 'medium',
                     ],
+					[
+						'name'              => 'footer_text',
+						'tooltip'           => esc_html__( 'The text that will be displayed in the footer of the messages.', 'gf-discord' ),
+						'label'             => esc_html__( 'Message Footer Text', 'gf-discord' ),
+						'type'              => 'text',
+						'class'             => 'medium',
+						'default_value' 	=> home_url(),
+						'feedback_callback' => [ $this, 'is_valid_setting' ],
+                    ],
                 ],
             ],
 			[
@@ -1058,12 +1067,20 @@ class GF_Discord extends GFFeedAddOn {
 			];
 		}
 
+		// Add the footer
+		if ( isset( $feed[ 'meta' ][ 'footer' ] ) && !$feed[ 'meta' ][ 'footer' ] ) {
+			$footer = false;
+		} else {
+			$footer = true;
+		}
+
         // Put the message args together
         $args = [
 			'user_id'  => $user_id,
             'email'    => $email,
 			'webhook'  => $feed[ 'meta' ][ 'webhook' ],
-			'date'     => $entry[ 'date_created' ]
+			'date'     => $entry[ 'date_created' ],
+			'footer'   => $footer
         ];
 
         // Send the message
@@ -1161,14 +1178,31 @@ class GF_Discord extends GFFeedAddOn {
 				],
 				'thumbnail'   => [
 					'url'        => $image
-				],
-				'footer'      => [
-					'text'       => home_url().' Test 3',
-					'icon_url'   => GFDISC_PLUGIN_DIR.'img/wordpress-logo.png'
-				],
-				'timestamp'   => $this->convert_timezone( date( 'Y-m-d H:i:s', strtotime( $args[ 'date' ] ) ), 'c' ),
+				]
 			]
 		];
+
+		// Get the footer
+		$has_footer = $args[ 'footer' ];
+        if ( $has_footer ) {
+
+			// Get the footer text
+			$get_footer_text = sanitize_text_field( $this->get_plugin_setting( 'footer_text' ) );
+			if ( $get_footer_text && $get_footer_text != '' ) {
+				$footer_text = $get_footer_text;
+			} else {
+				$footer_text = home_url(); // URL
+			}
+
+			// Add the footer
+			$data[ 'embeds' ][0][ 'footer' ] = [
+				'text'       => $footer_text,
+				'icon_url'   => GFDISC_PLUGIN_DIR.'img/wordpress-logo.png'
+			];
+
+			// Add the timestamp, that shows up in the footer
+			$data[ 'embeds' ][0][ 'timestamp' ] = $this->convert_timezone( date( 'Y-m-d H:i:s', strtotime( $args[ 'date' ] ) ), 'c' );
+        }
 
         // Encode
         $json_data = json_encode( $data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
@@ -1303,6 +1337,13 @@ class GF_Discord extends GFFeedAddOn {
 		$facts[] = [
 			'label' 		=> 'Source URL',
         	'name' 			=> 'source_url',
+			'default_value' => true,
+		];
+
+		// Add the footer
+		$facts[] = [
+			'label' 		=> 'Footer',
+        	'name' 			=> 'footer',
 			'default_value' => true,
 		];
 

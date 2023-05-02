@@ -1,3 +1,8 @@
 == changelog.txt ==
+= 1.0.2 =
+* Update: Added option for removing footer altogether on feeds
+* Update: Added field to form settings for customizing the footer (props enes#4893)
+* Fix: Removed "Test 3" from footer
+
 = 1.0.1 =
-* Created this plugin on March 16, 2023
+* Created plugin on March 16, 2023
