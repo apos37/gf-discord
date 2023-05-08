@@ -4,7 +4,7 @@ Donate link: https://paypal.com/donate/?business=3XHJUEHGTMK3N
 Tags: discord, server, gravity, forms, chat, webhook
 Requires at least: 5.9.0
 Tested up to: 6.2
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPL v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -19,7 +19,7 @@ Automatically send Gravity Form entries to a Discord channel using an Incoming W
 3. Go to Gravity Forms > Settings > Discord.
 
 = Where can I request features and get further support? =
-Join my [WordPress Support Discord server](https://discord.gg/VeMTXRVkm5)
+Join my [WordPress Support Discord server](https://discord.gg/3HnzNEJVnR)
 
 == Screenshots ==
 1. Plugin settings page
@@ -28,6 +28,9 @@ Join my [WordPress Support Discord server](https://discord.gg/VeMTXRVkm5)
 4. Discord channel post
 
 == Changelog ==
+= 1.0.3 =
+* Tweak: Updated Discord link
+
 = 1.0.2 =
 * Update: Added option for removing footer altogether on feeds
 * Update: Added field to form settings for customizing the footer (props enes#4893)

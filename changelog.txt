@@ -1,4 +1,7 @@
 == changelog.txt ==
+= 1.0.3 =
+* Tweak: Updated Discord link
+
 = 1.0.2 =
 * Update: Added option for removing footer altogether on feeds
 * Update: Added field to form settings for customizing the footer (props enes#4893)
