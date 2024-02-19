@@ -1,4 +1,15 @@
 == changelog.txt ==
+= 1.0.5 =
+* Fix: & symbol displayed as &amp;
+* Fix: Deprecation notice passing # in hexdec()
+* Update: Added support for tagging a channel via the feed message box using {{#channel_id}}
+* Update: Added support for mentioning a user via the feed message box using {{@user_id}} (props yaboinish)
+* Fix: URL back to form entry not working properly
+
+= 1.0.4 =
+* Note: I use this plugin regularly on over a dozen websites. It still works good, but if I go too long without updating it people will have fits.
+* Tweak: Removed some comments
+
 = 1.0.3 =
 * Tweak: Updated Discord link
 

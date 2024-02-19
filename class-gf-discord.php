@@ -675,6 +675,7 @@ class GF_Discord extends GFFeedAddOn {
 						'label'   => esc_html__( 'Message (Optional) — Discord Formatting/Markdown is Allowed', 'gf-discord' ),
 						'type'    => 'textarea',
 						'class'   => 'medium merge-tag-support mt-position-right',
+						'tooltip' => esc_html__( 'You can mention a user on the server with {{@user_id}}. Likewise, you can tag a channel with {{#channel_id}}.', 'gf-discord' ), 
 					],
 					[
 						'name'  	=> 'top_section_footer',
@@ -765,7 +766,7 @@ class GF_Discord extends GFFeedAddOn {
 		echo '</pre>
 		<style>
 		#gform-settings-section-feed-settings { 
-			border-left: 5px solid '.esc_attr( $color ).' !important; 
+			border-left: 5px solid #'.esc_attr( $color ).' !important; 
 		}
 		</style>';
 
@@ -863,7 +864,7 @@ class GF_Discord extends GFFeedAddOn {
 
 		// If email address is invalid, log error and return.
 		if ( GFCommon::is_invalid_or_empty_email( $email ) ) {
-			$this->add_feed_error( esc_html__( 'A valid Email address must be provided.', 'gf-discord' ), $feed, $entry, $form );
+			$this->add_feed_error( esc_html__( 'A valid email address must be provided.', 'gf-discord' ), $feed, $entry, $form );
 			return $entry;
 		}
 
@@ -1010,8 +1011,13 @@ class GF_Discord extends GFFeedAddOn {
 				$label = $label.':';
 			}
 
-            // Add the fact
+            // Should we add it?
 			if ( !$hiding || ( $hiding && $value != '' ) ) {
+
+				// Decode &amp;, etc
+				$value = htmL_entity_decode( $value );
+
+				// Add it
 				$facts[] = [
 					'name'   => $label,
 					'value'  => $value,
@@ -1139,6 +1145,10 @@ class GF_Discord extends GFFeedAddOn {
 		$get_message = sanitize_textarea_field( $feed[ 'meta' ][ 'message' ] );
         if ( $get_message && $get_message != '' ) {
 			$message = GFCommon::replace_variables( $get_message, $form, $entry, false, true, false, 'text' );
+
+			// Allow mentioning users and channels
+			$message = preg_replace( '/\{\{@([0-9]*?)\}\}/', '<@$1>', $message );
+			$message = preg_replace( '/\{\{#([0-9]*?)\}\}/', '<#$1>', $message );
         } else {
             $message = '';
         }
@@ -1170,7 +1180,7 @@ class GF_Discord extends GFFeedAddOn {
 					'url'        => home_url()
 				],
 				'title'       => $title,
-				'url'         => admin_url( 'admin.php?page=gf_entries&view=entry&id='.$args[ 'form_id' ].'&lid='.$args[ 'entry_id' ] ),
+				'url'         => admin_url( 'admin.php?page=gf_entries&view=entry&id='.$form[ 'id' ].'&lid='.$entry[ 'id' ] ),
 				'description' => $message,
 				'fields'      => $facts,
 				'image'       => [
@@ -1285,7 +1295,7 @@ class GF_Discord extends GFFeedAddOn {
 			'email'  => [
 				'type' 		  => 'email',
 				'name'		  => 'Email',
-				'required'	  => true,
+				'required'	  => false,
 			],
 		];
 
@@ -1416,13 +1426,16 @@ class GF_Discord extends GFFeedAddOn {
 
 			// If it does not have hash
 			} else {
-				$color = '#'.sanitize_hex_color_no_hash( $color );
+				$color = sanitize_hex_color_no_hash( $color );
 			}
 
 		// Otherwise return the sanitized default
 		} else {
 			$color = sanitize_hex_color( $default );
 		}
+
+		// Remove hashtag
+		$color = ltrim( $color, '\#' );
 
 		// Return the color
 		return $color;
