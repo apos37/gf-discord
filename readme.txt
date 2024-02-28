@@ -1,10 +1,11 @@
 === Add-On for Discord and Gravity Forms ===
 Contributors: apos37
 Donate link: https://paypal.com/donate/?business=3XHJUEHGTMK3N
-Tags: discord, server, gravity, forms, chat, webhook
+Tags: discord, server, gravity, forms, webhook
 Requires at least: 5.9.0
+Requires PHP: 7.4
 Tested up to: 6.4.3
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPL v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -18,11 +19,36 @@ Automatically send Gravity Form entries to a Discord channel using an Incoming W
 2. Activate it.
 3. Go to Gravity Forms > Settings > Discord.
 
+== Frequently Asked Questions == 
 = Where can I request features and get further support? =
 Join my [WordPress Support Discord server](https://discord.gg/3HnzNEJVnR)
 
 = How can I mention a user or tag a channel in my messages? =
-From the form's Discord feed, you can mention a user with {{@user_id}} and tag a channel with {{#channel_id}}. If you're unfamiliar with where to find these IDs, check out [this article](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID) on Discord.
+From the form's Discord feed, you can mention a user with `{{@user_id}}` or a role with `{{@&role_id}}`, and tag a channel with `{{#channel_id}}`. If you're unfamiliar with where to find these IDs, check out [this article](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID) on Discord.
+
+= How can I further customize the message sent to Discord? =
+With version 1.0.6, you can now use the following hook:
+
+`<?php
+add_filter( 'gf_discord_embeds', 'my_gf_discord_embeds', 10, 3 );
+function my_gf_discord_embeds( $embeds, $form, $entry ) {
+	// Filter the message
+	$embeds[0][ 'description' ] = str_replace( '{{my_own_merge_tag}}', 'New Value', $embeds[0][ 'description' ] );
+
+	// Add a new field
+	$user_id = $entry[ 'created_by' ];
+	$user = get_user_by( 'ID', $user_id );
+	$display_name = $user->display_name;
+	
+	$embeds[0][ 'fields' ][] = [
+		'name'  => 'Completed By:',
+		'value' => $display_name
+	];
+
+	// Always return embeds
+	return $embeds;
+} // End my_gf_discord_embeds()
+?>`
 
 == Screenshots ==
 1. Plugin settings page
@@ -31,10 +57,15 @@ From the form's Discord feed, you can mention a user with {{@user_id}} and tag a
 4. Discord channel post
 
 == Changelog ==
+= 1.0.6 =
+* Update: Added filter for embeds to further customize message
+* Tweak: Added support for mentioning a role via the feed message box using `{{@&role_id}}`
+
 = 1.0.5 =
 * Fix: & symbol displayed as &amp;
 * Fix: Deprecation notice passing # in hexdec()
-* Update: Added support for pinging someone via the feed message box using {{{@user_id_number}}}
+* Update: Added support for tagging a channel via the feed message box using `{{#channel_id}}`
+* Update: Added support for mentioning a user via the feed message box using `{{@user_id}}` (props yaboinish)
 * Fix: URL back to form entry not working properly
 
 = 1.0.4 =

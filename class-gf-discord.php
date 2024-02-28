@@ -675,7 +675,7 @@ class GF_Discord extends GFFeedAddOn {
 						'label'   => esc_html__( 'Message (Optional) — Discord Formatting/Markdown is Allowed', 'gf-discord' ),
 						'type'    => 'textarea',
 						'class'   => 'medium merge-tag-support mt-position-right',
-						'tooltip' => esc_html__( 'You can mention a user on the server with {{@user_id}}. Likewise, you can tag a channel with {{#channel_id}}.', 'gf-discord' ), 
+						'tooltip' => esc_html__( 'You can mention a user on the server with {{@user_id}}. Likewise, you can tag a role with {{@&role_id}} and a channel with {{#channel_id}}.', 'gf-discord' ), 
 					],
 					[
 						'name'  	=> 'top_section_footer',
@@ -1146,8 +1146,9 @@ class GF_Discord extends GFFeedAddOn {
         if ( $get_message && $get_message != '' ) {
 			$message = GFCommon::replace_variables( $get_message, $form, $entry, false, true, false, 'text' );
 
-			// Allow mentioning users and channels
+			// Allow mentioning users, roles and channels
 			$message = preg_replace( '/\{\{@([0-9]*?)\}\}/', '<@$1>', $message );
+			$message = preg_replace( '/\{\{@\&([0-9]*?)\}\}/', '<@&$1>', $message );
 			$message = preg_replace( '/\{\{#([0-9]*?)\}\}/', '<#$1>', $message );
         } else {
             $message = '';
@@ -1171,7 +1172,7 @@ class GF_Discord extends GFFeedAddOn {
         }
 
         // Embed
-        $data[ 'embeds' ] = [
+        $data[ 'embeds' ] = apply_filters( 'gf_discord_embeds', [
 			[
 				'type'        => 'rich',
 				'color'       => hexdec( $color ),
@@ -1190,7 +1191,7 @@ class GF_Discord extends GFFeedAddOn {
 					'url'        => $image
 				]
 			]
-		];
+		], $form, $entry );
 
 		// Get the footer
 		$has_footer = $args[ 'footer' ];

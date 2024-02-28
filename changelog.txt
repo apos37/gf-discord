@@ -1,4 +1,8 @@
 == changelog.txt ==
+= 1.0.6 =
+* Update: Added filter for embeds to further customize message
+* Tweak: Added support for mentioning a role via the feed message box using {{@&role_id}}
+
 = 1.0.5 =
 * Fix: & symbol displayed as &amp;
 * Fix: Deprecation notice passing # in hexdec()
