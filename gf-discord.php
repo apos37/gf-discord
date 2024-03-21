@@ -3,7 +3,7 @@
  * Plugin Name:         Add-On for Discord and Gravity Forms
  * Plugin URI:          https://apos37.com/wordpress-addon-for-discord-gravity-forms/
  * Description:         Send Gravity Form entries to a Discord channel
- * Version:             1.0.6
+ * Version:             1.0.7
  * Requires at least:   5.9.0
  * Tested up to:        6.4.3
  * Requires PHP:        7.4
@@ -25,7 +25,7 @@ if ( !defined( 'ABSPATH' ) ) {
  */
 define( 'GFDISC_NAME', 'Add-On for Discord and Gravity Forms' );
 define( 'GFDISC_TEXTDOMAIN', 'gf-discord' );
-define( 'GFDISC_VERSION', '1.0.6' );
+define( 'GFDISC_VERSION', '1.0.7' );
 define( 'GFDISC_PLUGIN_ROOT', plugin_dir_path( __FILE__ ) );                                                  // /home/.../public_html/wp-content/plugins/gf-discord/
 define( 'GFDISC_PLUGIN_DIR', plugins_url( '/'.GFDISC_TEXTDOMAIN.'/' ) );                                      // https://domain.com/wp-content/plugins/gf-discord/
 define( 'GFDISC_SETTINGS_URL', admin_url( 'admin.php?page=gf_settings&subview='.GFDISC_TEXTDOMAIN ) );        // https://domain.com/wp-admin/admin.php?page=gf_settings&subview=gf-discord/

@@ -5,7 +5,7 @@ Tags: discord, server, gravity, forms, webhook
 Requires at least: 5.9.0
 Requires PHP: 7.4
 Tested up to: 6.4.3
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GPL v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -21,7 +21,7 @@ Automatically send Gravity Form entries to a Discord channel using an Incoming W
 
 == Frequently Asked Questions == 
 = Where can I request features and get further support? =
-Join my [WordPress Support Discord server](https://discord.gg/3HnzNEJVnR)
+Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
 
 = How can I mention a user or tag a channel in my messages? =
 From the form's Discord feed, you can mention a user with `{{@user_id}}` or a role with `{{@&role_id}}`, and tag a channel with `{{#channel_id}}`. If you're unfamiliar with where to find these IDs, check out [this article](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID) on Discord.
@@ -57,6 +57,10 @@ function my_gf_discord_embeds( $embeds, $form, $entry ) {
 4. Discord channel post
 
 == Changelog ==
+= 1.0.7 =
+* Fix: Multiselect fields not showing all values (props calamarigold)
+* Tweak: Removed required email field (props calamarigold)
+
 = 1.0.6 =
 * Update: Added filter for embeds to further customize message
 * Tweak: Added support for mentioning a role via the feed message box using `{{@&role_id}}`

@@ -1,4 +1,8 @@
 == changelog.txt ==
+= 1.0.7 =
+* Fix: Multiselect fields not showing all values (props calamarigold)
+* Tweak: Removed required email field (props calamarigold)
+
 = 1.0.6 =
 * Update: Added filter for embeds to further customize message
 * Tweak: Added support for mentioning a role via the feed message box using {{@&role_id}}

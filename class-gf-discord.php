@@ -688,13 +688,6 @@ class GF_Discord extends GFFeedAddOn {
 				'title'  => esc_html__( 'Fields', 'gf-discord' ),
 				'fields' => [
 					[
-						'name'      => 'mappedFields',
-						'label'     => esc_html__( 'Match required fields', 'gf-discord' ),
-						'type'      => 'field_map',
-						'field_map' => $this->merge_vars_field_map(),
-						'tooltip'   => esc_html__( 'Setup the message values by selecting the appropriate form field from the list.', 'gf-discord' ),
-					],
-					[
 						'name'    => 'checkboxgroup',
 						'label'   => esc_html__( 'Include the following fields and additional information in Discord Message' ),
 						'type'    => 'checkbox',
@@ -856,47 +849,8 @@ class GF_Discord extends GFFeedAddOn {
 			return $entry;
 		}
 
-		// Retrieve the name => value pairs for all fields mapped in the 'mappedFields' field map.
-		$field_map = $this->get_field_map_fields( $feed, 'mappedFields' );
-
-		// Get mapped email address.
-		$email = $this->get_field_value( $form, $entry, $field_map[ 'email' ] );
-
-		// If email address is invalid, log error and return.
-		if ( GFCommon::is_invalid_or_empty_email( $email ) ) {
-			$this->add_feed_error( esc_html__( 'A valid email address must be provided.', 'gf-discord' ), $feed, $entry, $form );
-			return $entry;
-		}
-
-		// Loop through the fields from the field map setting building an array of values to be passed to the third-party service.
-		$merge_vars = [];
-		foreach ( $field_map as $name => $field_id ) {
-
-			// If no field is mapped, skip it.
-			if ( rgblank( $field_id ) ) {
-				continue;
-			}
-
-			// Get field value.
-			$field_value = $this->get_field_value( $form, $entry, $field_id );
-
-			// If field value is empty, skip it.
-			if ( empty( $field_value ) ) {
-				continue;
-			}
-
-			// Get the field value for the specified field id
-			$merge_vars[ $name ] = $field_value;
-		}
-
-		// Check if there are empty mapped fields
-		if ( empty( $merge_vars ) ) {
-			$this->add_feed_error( esc_html__( 'Aborted: Empty merge fields', 'gf-discord' ), $feed, $entry, $form );
-			return $entry;
-		}
-
 		// If sending failed
-		if ( !$this->send_form_entry( $feed, $entry, $form, $email ) ) {
+		if ( !$this->send_form_entry( $feed, $entry, $form ) ) {
 
 			// Log that registration failed.
 			$this->add_feed_error( esc_html__( $this->_short_title.' error when trying to send message to channel', 'gf-discord' ), $feed, $entry, $form ); // phpcs:ignore
@@ -933,7 +887,7 @@ class GF_Discord extends GFFeedAddOn {
      * @param array $form
      * @return array
      */
-    public function send_form_entry( $feed, $entry, $form, $email ) {
+    public function send_form_entry( $feed, $entry, $form ) {
 		// Are we hiding empty values?
 		if ( isset( $feed[ 'meta' ][ 'hide_blank' ] ) && $feed[ 'meta' ][ 'hide_blank' ] ) {
 			$hiding = true;
@@ -943,6 +897,9 @@ class GF_Discord extends GFFeedAddOn {
 
         // Store the message facts
         $facts = [];
+
+		// Email var
+		$email = false;
 
         // Iter the fields
         foreach ( $form[ 'fields' ] as $field ) {
@@ -979,6 +936,11 @@ class GF_Discord extends GFFeedAddOn {
                 
 				// Get the choices
                 $value = $this->get_gf_checkbox_values( $form, $entry, $field_id );
+
+			// Multiselect
+            } elseif ( $field->type == 'multiselect' ) {
+				ddtt_write_log( 'Is Multiselect' );
+                $value = $this->get_multiselect_values( $entry[ $field_id ] );
             
             // Radio/survey/select
             } elseif ( $field->type != 'quiz' && $field->choices && !empty( $field->choices ) ) {
@@ -1023,44 +985,17 @@ class GF_Discord extends GFFeedAddOn {
 					'value'  => $value,
 				];
 			}
-
-            // Check if the field type is a survey
-            if ( !$email && $field->type == 'email' && isset( $entry[ $field_id ] ) ) {
-                $email = $entry[ $field_id ];
-            }
         }
 
         // Check for a user id
         $user_id = $entry[ 'created_by' ];        
-
-        // Did we not find an email?
-        if ( ( !$email || $email == '' ) && $user_id > 0 ) {
-
-            // Check if the user exists
-            if ( $user = get_userdata( $user_id ) ) {
-
-                // Get the email
-                $email = $user->user_email;
-            }
-        }
-
-		// Last resort user id
-		if ( $email && $email != '' && ( !$user_id || $user_id == 0 || $user_id == '' ) ) {
-			
-			// Attempt to find user by email
-			if ( $user = get_user_by( 'email', $email ) ) {
-				
-				// Set the user id
-				$user_id = $user->ID;
-			}
-		}
 
         // Add the source url as a fact
 		if ( isset( $feed[ 'meta' ][ 'source_url' ] ) && $feed[ 'meta' ][ 'source_url' ] ) {
 			$facts[] = [
 				'name'  => 'Source URL:',
 				'value' => $entry[ 'source_url' ],
-				'inline' => true
+				'inline' => false
 			];
 		}
 
@@ -1069,7 +1004,7 @@ class GF_Discord extends GFFeedAddOn {
 			$facts[] = [
 				'name'  => 'User ID:',
 				'value' => $user_id,
-				'inline' => true
+				'inline' => false
 			];
 		}
 
@@ -1303,6 +1238,43 @@ class GF_Discord extends GFFeedAddOn {
 		// Return the fields
 		return $fields;
 	} // End get_list_merge_fields()
+
+
+	/**
+	 * Get the multiselect values
+	 *
+	 * @param string|false $value
+	 * @return string
+	 */
+	public function get_multiselect_values( $value ) {
+		if ( $value && $value != '' ) {
+			ddtt_write_log( $value );
+			ddtt_write_log( $this->to_array( $value ) );
+			$value = implode( ', ', $this->to_array( $value ) );
+			return esc_html( $value );
+		}
+		return '';
+	} // End get_multiselect_values()
+
+
+	/**
+	 * Convert string array to array
+	 *
+	 * @param string $value
+	 * @return array
+	 */
+	public function to_array( $value ) {
+		if ( empty( $value ) ) {
+			return array();
+		} elseif ( is_array( $value ) ) {
+			return $value;
+		} elseif ( $value[0] !== '[' ) {
+			return array_map( 'trim', explode( ',', $value ) );
+		} else {
+			$json = json_decode( $value, true );
+			return $json == null ? array() : $json;
+		}
+	} // End to_array()
 
 
 	/**
