@@ -5,8 +5,8 @@ Tags: discord, server, gravity, forms, webhook
 Requires at least: 5.9.0
 Requires PHP: 7.4
 Tested up to: 6.4.3
-Stable tag: 1.0.7
-License: GPL v2 or later
+Stable tag: 1.0.8
+License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
 Automatically send Gravity Form entries to a Discord channel.
@@ -57,6 +57,9 @@ function my_gf_discord_embeds( $embeds, $form, $entry ) {
 4. Discord channel post
 
 == Changelog ==
+= 1.0.8 =
+* Fix: Fatal error undefined function (props calamarigold)
+
 = 1.0.7 =
 * Fix: Multiselect fields not showing all values (props calamarigold)
 * Tweak: Removed required email field (props calamarigold)

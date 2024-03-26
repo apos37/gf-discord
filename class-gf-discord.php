@@ -939,7 +939,6 @@ class GF_Discord extends GFFeedAddOn {
 
 			// Multiselect
             } elseif ( $field->type == 'multiselect' ) {
-				ddtt_write_log( 'Is Multiselect' );
                 $value = $this->get_multiselect_values( $entry[ $field_id ] );
             
             // Radio/survey/select
@@ -1248,8 +1247,6 @@ class GF_Discord extends GFFeedAddOn {
 	 */
 	public function get_multiselect_values( $value ) {
 		if ( $value && $value != '' ) {
-			ddtt_write_log( $value );
-			ddtt_write_log( $this->to_array( $value ) );
 			$value = implode( ', ', $this->to_array( $value ) );
 			return esc_html( $value );
 		}

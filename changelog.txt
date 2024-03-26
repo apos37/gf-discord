@@ -1,4 +1,7 @@
 == changelog.txt ==
+= 1.0.8 =
+* Fix: Fatal error undefined function (props calamarigold)
+
 = 1.0.7 =
 * Fix: Multiselect fields not showing all values (props calamarigold)
 * Tweak: Removed required email field (props calamarigold)
