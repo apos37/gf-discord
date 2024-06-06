@@ -1,18 +1,33 @@
 === Add-On for Discord and Gravity Forms ===
 Contributors: apos37
-Donate link: https://paypal.com/donate/?business=3XHJUEHGTMK3N
 Tags: discord, server, gravity, forms, webhook
 Requires at least: 5.9.0
 Requires PHP: 7.4
-Tested up to: 6.4.3
-Stable tag: 1.0.8
+Tested up to: 6.5.4
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
 Automatically send Gravity Form entries to a Discord channel.
 
 == Description ==
-Automatically send Gravity Form entries to a Discord channel using an Incoming Webhook.
+The "Add-On for Discord and Gravity Forms" WordPress plugin is a fantastic tool that bridges the gap between your website's forms and your Discord community! It seamlessly integrates Gravity Forms, a popular form builder plugin, with Discord, a leading communication platform.
+
+With this add-on, you can:
+
+* Automatically send form submissions to a designated Discord channel
+* Map form fields to Discord message embeds, making it easy to display user-submitted data
+* Trigger custom notifications and messages based on form responses
+* Enhance user engagement and community interaction
+
+This plugin is perfect for:
+
+* Community managers who want to centralize form submissions and discussions
+* Developers who need to streamline form data and notifications
+* Site owners who want to foster a more interactive and responsive community
+* Those that have unreliable email systems
+
+By connecting Gravity Forms and Discord, this add-on simplifies communication, enhances user experience, and boosts community engagement! It's a win-win for anyone looking to supercharge their online interactions!
 
 == Installation ==
 1. Install the plugin from your website's plugin directory, or upload the plugin to your plugins folder. 
@@ -57,6 +72,10 @@ function my_gf_discord_embeds( $embeds, $form, $entry ) {
 4. Discord channel post
 
 == Changelog ==
+= 1.0.9 =
+* Update: Added support for other post custom fields
+* Fix: Multiselect post custom fields not showing all values (props calamarigold)
+
 = 1.0.8 =
 * Fix: Fatal error undefined function (props calamarigold)
 

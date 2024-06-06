@@ -927,19 +927,24 @@ class GF_Discord extends GFFeedAddOn {
             if ( $field->type == 'consent' ) {
 
                 // If they selected the consent checkbox
-                if ( isset( $entry[ $field_id ] ) && $entry[ $field_id ] == 1 ) {
+                if ( ( isset( $entry[ $field_id ] ) && $entry[ $field_id ] == 1 ) || 
+					 ( isset( $entry[ $field_id.'.1' ] ) && $entry[ $field_id.'.1' ] == 1 ) ) {
                     $value = 'True';
                 }
 
 			// Checkbox
-            } elseif ( $field->type == 'checkbox' ) {
+            } elseif ( $field->type == 'checkbox' || ( $field->type == 'post_custom_field' && $field->inputType == 'checkbox' ) ) {
                 
 				// Get the choices
                 $value = $this->get_gf_checkbox_values( $form, $entry, $field_id );
 
 			// Multiselect
-            } elseif ( $field->type == 'multiselect' ) {
+            } elseif ( $field->type == 'multiselect' || ( $field->type == 'post_custom_field' && $field->inputType == 'multiselect' ) ) {
                 $value = $this->get_multiselect_values( $entry[ $field_id ] );
+
+			// List
+            } elseif ( $field->type == 'list' || ( $field->type == 'post_custom_field' && $field->inputType == 'list' ) ) {
+                $value = $this->get_list_values( $entry[ $field_id ] );
             
             // Radio/survey/select
             } elseif ( $field->type != 'quiz' && $field->choices && !empty( $field->choices ) ) {
@@ -1272,6 +1277,21 @@ class GF_Discord extends GFFeedAddOn {
 			return $json == null ? array() : $json;
 		}
 	} // End to_array()
+
+
+	/**
+	 * Get the multiselect values
+	 *
+	 * @param string|false $value
+	 * @return string
+	 */
+	public function get_list_values( $value ) {
+		if ( $value && $value != '' ) {
+			$value = implode( ', ', unserialize( $value ) );
+			return esc_html( $value );
+		}
+		return '';
+	} // End get_list_values()
 
 
 	/**
