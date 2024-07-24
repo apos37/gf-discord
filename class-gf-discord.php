@@ -75,6 +75,14 @@ class GF_Discord extends GFFeedAddOn {
 	 */
 	protected $_short_title = 'Discord';
 
+
+	/**
+	 * Nonce
+	 *
+	 * @var string $nonce
+	 */
+	private $nonce = 'discord_nonce';
+
 	
 	/**
 	 * Core singleton class
@@ -197,7 +205,8 @@ class GF_Discord extends GFFeedAddOn {
 			if ( !empty( $feeds ) ) {
 
 				// Send the form entry if query string says so
-				if ( isset( $_GET[ 'gfdisc' ] ) && sanitize_text_field( $_GET[ 'gfdisc' ] )  == 'true' &&
+				if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], $this->nonce ) &&
+					isset( $_GET[ 'gfdisc' ] ) && sanitize_text_field( $_GET[ 'gfdisc' ] )  == 'true' &&
 					isset( $_GET[ 'feed_id' ] ) && absint( $_GET[ 'feed_id' ] ) != '' ) {
 
 					// The feed id
@@ -230,7 +239,8 @@ class GF_Discord extends GFFeedAddOn {
 					$current_url = '/wp-admin/admin.php?page=gf_entries&view=entry&id='.$form[ 'id' ].'&lid='.$entry[ 'id' ];
 
 					// Resend button
-					$results .= '<a class="button" href="'.$current_url.'&feed_id='.$feed[ 'id' ].'&gfdisc=true">Resend</a>';
+					$resent_url = wp_nonce_url( $current_url.'&feed_id='.$feed[ 'id' ].'&gfdisc=true', $this->nonce );
+					$results .= '<a class="button" href="'.$resent_url.'">Resend</a>';
 
 					// Space between
 					$results .= $br;
@@ -269,7 +279,25 @@ class GF_Discord extends GFFeedAddOn {
 	 * @return string
 	 */
 	public function get_menu_icon() {
-		return file_get_contents( $this->get_base_path().'/img/discord-icon.svg' );
+		global $wp_filesystem;
+		if ( !function_exists( 'request_filesystem_credentials' ) ) {
+			require_once( ABSPATH . 'wp-admin/includes/file.php' );
+		}
+		if ( !WP_Filesystem() ) {
+			return '';
+		}
+
+		$file_path = $this->get_base_path().'/img/discord-icon.svg';
+
+		// Ensure the file exists and is readable
+		if ( $wp_filesystem->exists( $file_path ) && $wp_filesystem->is_readable( $file_path ) ) {
+			$icon = $wp_filesystem->get_contents( $file_path );
+	
+			// Escape the SVG output
+			return $icon;
+		} else {
+			return '';
+		}
 	} // End get_menu_icon()
 
 
@@ -411,9 +439,9 @@ class GF_Discord extends GFFeedAddOn {
         $button = $field[ 'args' ][ 'button' ];
         printf(
             '<input type="button" id="%s" class="%s" value="%s"/>',
-            $button[ 'name' ],
-            $button[ 'class' ],
-            $button[ 'value' ],
+            esc_attr( $button[ 'name' ] ),
+			esc_attr( $button[ 'class' ] ),
+			esc_attr( $button[ 'value' ] )
         );
     } // End settings_media_upload()
 
@@ -617,10 +645,10 @@ class GF_Discord extends GFFeedAddOn {
 			$form = GFAPI::get_form( $feed[ 'form_id' ] );
 			
 		// Or else get the id from the query string
-		} elseif ( isset( $_GET[ 'id' ] ) && absint( $_GET[ 'id' ] ) != '' ) {
+		} elseif ( isset( $_GET[ 'id' ] ) && absint( $_GET[ 'id' ] ) != '' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			// Get the form
-			$form = GFAPI::get_form( absint( $_GET[ 'id' ] ) );
+			$form = GFAPI::get_form( absint( $_GET[ 'id' ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// Or no form
 		} else {
@@ -736,10 +764,10 @@ class GF_Discord extends GFFeedAddOn {
 		$color = $this->get_setting( 'color' );
 		printf(
 			'<input type="color" id="%s" name="%s" class="%s" value="%s" style="width: 10rem;"/>',
-			$field[ 'name' ],
-			$field[ 'name' ],
-			$field[ 'class' ],
-			$color,
+			esc_attr( $field[ 'name' ] ),
+			esc_attr( $field[ 'name' ] ),
+			esc_attr( $field[ 'class' ] ),
+			esc_attr( $color ),
 		);
     } // End settings_color()
 
@@ -853,7 +881,7 @@ class GF_Discord extends GFFeedAddOn {
 		if ( !$this->send_form_entry( $feed, $entry, $form ) ) {
 
 			// Log that registration failed.
-			$this->add_feed_error( esc_html__( $this->_short_title.' error when trying to send message to channel', 'gf-discord' ), $feed, $entry, $form ); // phpcs:ignore
+			$this->add_feed_error( esc_html__( 'Discord error when trying to send message to channel', 'gf-discord' ), $feed, $entry, $form ); // phpcs:ignore
 			return false;
 
 		// If we sent the form entry successfully
@@ -871,7 +899,7 @@ class GF_Discord extends GFFeedAddOn {
             $sub_type = 'success';
             
             // Log that the registrant was added.
-            RGFormsModel::add_note( $entry[ 'id' ], 0, __( $this->_short_title, 'gf-discord' ), $note, 'gfdisc', $sub_type );
+            RGFormsModel::add_note( $entry[ 'id' ], 0, __( 'Discord', 'gf-discord' ), $note, 'gfdisc', $sub_type );
 			$this->log_debug( __METHOD__ . '(): Message sent successfully.' ); // phpcs:ignore
 		}
 
@@ -1151,11 +1179,11 @@ class GF_Discord extends GFFeedAddOn {
 			];
 
 			// Add the timestamp, that shows up in the footer
-			$data[ 'embeds' ][0][ 'timestamp' ] = $this->convert_timezone( date( 'Y-m-d H:i:s', strtotime( $args[ 'date' ] ) ), 'c' );
+			$data[ 'embeds' ][0][ 'timestamp' ] = $this->convert_timezone( gmdate( 'Y-m-d H:i:s', strtotime( $args[ 'date' ] ) ), 'c' );
         }
 
         // Encode
-        $json_data = json_encode( $data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        $json_data = wp_json_encode( $data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 
 		// Remote post options
         $options = [
