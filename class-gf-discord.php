@@ -991,7 +991,7 @@ class GF_Discord extends GFFeedAddOn {
                     }
                 }
 
-			// Otherwise just return the field value    
+			// Name   
             } elseif ( $field->type == 'name' ) {
                 $value = $entry[ $field_id.'.3' ].' '.$entry[ $field_id.'.6' ];
 
