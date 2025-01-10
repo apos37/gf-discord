@@ -413,6 +413,16 @@ class GF_Discord extends GFFeedAddOn {
                 ],
             ],
 			[
+				'title'       => esc_html__( 'My Feeds', 'gf-msteams' ),
+				'fields'      => [
+					[
+						'name'              => 'my_feeds',
+						'type'              => 'my_feeds',
+						'class'             => 'medium',
+                    ],
+                ],
+            ],
+			[
 				'title'       => esc_html__( 'Instructions', 'gf-discord' ),
 				'description' => '<p>'.esc_html__( 'How to add a webhook to Discord and setting up feeds.', 'gf-discord' ).'</p><br>',
 				'fields'      => [
@@ -595,6 +605,103 @@ class GF_Discord extends GFFeedAddOn {
 		</script>
 		<pre>';
     } // End settings_gfdisc_preview()
+
+
+	/**
+	 * Your Feeds field
+	 *
+	 * @param array $field
+	 * @param boolean $echo
+	 * @return void
+	 */
+	public function settings_my_feeds( $field, $echo = true ) {
+		// Start the container
+		echo '</pre>
+		<div>';
+
+		// Get all the feeds
+		$feeds = $this->get_feeds( null, null, null, false );
+
+		// Make sure we have forms
+		if ( !empty( $feeds ) ) {
+
+			// Start the table
+			echo '<table class="wp-list-table widefat fixed striped table-view-list feeds">
+				<thead>
+					<tr>
+						<th scope="col" id="feedName" class="manage-column column-feedName column-primary">Feed Name</th>
+						<th scope="col" id="feedStatus" class="manage-column column-feedStatus">Feed Status</th>
+						<th scope="col" id="channel" class="manage-column column-channel">Channel</th>	
+						<th scope="col" id="form" class="manage-column column-form column-primary">Form</th>
+						<th scope="col" id="formStatus" class="manage-column column-formStatus">Form Status</th>
+					</tr>
+				</thead>
+				<tbody id="the-list" data-wp-lists="list:feed">';
+
+			// Iter the feeds
+			foreach ( $feeds as $feed ) {
+
+				// Get the form id
+				$form_id = $feed[ 'form_id' ];
+
+				// Get the form
+				$form = GFAPI::get_form( $form_id );
+
+				// Get the form feeds link
+				$form_feeds_url = admin_url( 'admin.php?page=gf_edit_forms&view=settings&subview='.GFDISC_TEXTDOMAIN.'&id='.$form_id );
+
+				// Check if the form is active
+				if ( $form[ 'is_active' ] ) {
+					$is_form_active = 'Active';
+				} else {
+					$is_form_active = 'Inactive';
+				}
+
+				// Get the form feeds link
+				$feed_url = admin_url( 'admin.php?page=gf_edit_forms&view=settings&subview='.GFDISC_TEXTDOMAIN.'&id='.$form_id.'&fid='.$feed[ 'id' ] );
+
+				// Check if the form is active
+				if ( $feed[ 'is_active' ] ) {
+					$is_feed_active = '<span class="active" style="">Active</span>';
+				} else {
+					$is_feed_active = '<span class="inactive" style="color: red; font-style: italic;">Inactive</span>';
+				}
+
+				// Include channel
+				if ( isset( $feed[ 'meta' ][ 'channel' ] ) && sanitize_text_field( $feed[ 'meta' ][ 'channel' ] ) != '' ) {
+					$channel = sanitize_text_field( $feed[ 'meta' ][ 'channel' ] );
+				} else {
+					$channel = '';
+				}
+
+				// Echo the form title and count
+				echo '<tr>
+					<td class="feedName column-feedName column-primary" data-colname="Feed Name" style="font-weight: bold;"><a href="'.esc_url( $feed_url ).'">'.esc_html( $feed[ 'meta' ][ 'feedName' ] ).'</a></td>
+					<td class="feedStatus column-feedStatus column-primary" data-colname="Feed Status">'.wp_kses_post( $is_feed_active ).'</td>
+					<td class="channel column-channel" data-colname="Channel">'.esc_html( $channel ).'</td>
+					<td class="form column-form column-primary" data-colname="Form"><a href="'.esc_url( $form_feeds_url ).'">'.esc_html( $form[ 'title' ] ).'</a></td>
+					<td class="formStatus column-formStatus column-primary" data-colname="Form Status">'.wp_kses_post( $is_form_active ).'</td>
+				</tr>';
+			}
+
+			// End the list
+			echo '</tbody>
+				<tfoot>
+					<tr>
+						<th scope="col" id="feedName" class="manage-column column-feedName column-primary">Feed Name</th>
+						<th scope="col" id="feedStatus" class="manage-column column-feedStatus">Feed Status</th>
+						<th scope="col" id="channel" class="manage-column column-channel">Channel</th>	
+						<th scope="col" id="form" class="manage-column column-form column-primary">Form</th>
+						<th scope="col" id="formStatus" class="manage-column column-formStatus">Form Status</th>
+					</tr>
+				</tfoot>
+			</table>';
+		}
+
+		// End the container
+        echo '</div>
+		<pre>';
+    } // End settings_my_feeds()
 
 
 	/**
@@ -994,6 +1101,22 @@ class GF_Discord extends GFFeedAddOn {
 			// Name   
             } elseif ( $field->type == 'name' ) {
                 $value = $entry[ $field_id.'.3' ].' '.$entry[ $field_id.'.6' ];
+
+			// File Upload   
+            } elseif ( $field->type == 'fileupload' ) {
+				$file_urls = $entry[ $field_id ];
+				if ( is_string( $file_urls ) ) {
+					$file_urls = json_decode( $file_urls, true );
+				}
+				if ( is_array( $file_urls ) ) {
+					$discord_links = [];
+					foreach ( $file_urls as $url ) {
+						$filename = basename( $url );
+						$discord_links[] = "[{$filename}]({$url})";
+					}
+				
+					$value = implode( "\n", $discord_links );
+				}
 
             // Otherwise just return the field value    
             } elseif ( isset( $entry[ $field_id ] ) ) {
