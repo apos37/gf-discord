@@ -1,34 +1,49 @@
 <?php
 /**
  * Plugin Name:         Add-On for Discord and Gravity Forms
- * Plugin URI:          https://apos37.com/wordpress-addon-for-discord-gravity-forms/
+ * Plugin URI:          https://github.com/apos37/gf-discord
  * Description:         Send Gravity Form entries to a Discord channel
- * Version:             1.1.3
- * Requires at least:   5.9.0
- * Tested up to:        6.7.1
+ * Version:             1.2
+ * Requires at least:   5.9
+ * Tested up to:        6.7
  * Requires PHP:        7.4
- * Author:              Apos37
- * Author URI:          https://apos37.com/
+ * Author:              WordPress Enhanced
+ * Author URI:          https://wordpressenhanced.com/
+ * Support URI:         https://discord.gg/3HnzNEJVnR
  * Text Domain:         gf-discord
  * License:             GPLv2 or later
  * License URI:         http://www.gnu.org/licenses/gpl-2.0.txt
+ * Created on:          March 16, 2023
  */
 
-// Exit if accessed directly.
-if ( !defined( 'ABSPATH' ) ) {
-	exit;
-}
+ 
+/**
+ * Exit if accessed directly.
+ */
+if ( !defined( 'ABSPATH' ) ) exit;
 
 
 /**
  * Defines
  */
-define( 'GFDISC_NAME', 'Add-On for Discord and Gravity Forms' );
-define( 'GFDISC_TEXTDOMAIN', 'gf-discord' );
-define( 'GFDISC_VERSION', '1.1.3' );
+$plugin_data = get_file_data( __FILE__, [
+    'name'         => 'Plugin Name',
+    'version'      => 'Version',
+    'textdomain'   => 'Text Domain',
+    'support_uri'  => 'Support URI',
+] );
+
+
+/**
+ * Defines
+ */
+define( 'GFDISC_NAME', $plugin_data[ 'name' ] );
+define( 'GFDISC_TEXTDOMAIN', $plugin_data[ 'textdomain' ] );
+define( 'GFDISC_VERSION', $plugin_data[ 'version' ] );
 define( 'GFDISC_PLUGIN_ROOT', plugin_dir_path( __FILE__ ) );                                                  // /home/.../public_html/wp-content/plugins/gf-discord/
 define( 'GFDISC_PLUGIN_DIR', plugins_url( '/'.GFDISC_TEXTDOMAIN.'/' ) );                                      // https://domain.com/wp-content/plugins/gf-discord/
 define( 'GFDISC_SETTINGS_URL', admin_url( 'admin.php?page=gf_settings&subview='.GFDISC_TEXTDOMAIN ) );        // https://domain.com/wp-admin/admin.php?page=gf_settings&subview=gf-discord/
+define( 'GFDISC_DISCORD_SUPPORT_URL', $plugin_data[ 'support_uri' ] );
 
 
 /**
@@ -78,8 +93,8 @@ function gfdisc_plugin_row_meta( $links, $file ) {
 
         // Add the link
         $row_meta = [
-            'docs'    => '<a href="'.esc_url( 'https://apos37.com/wordpress-addon-for-discord-gravity-forms/' ).'" target="_blank" aria-label="'.esc_attr__( 'Plugin Website Link', 'gf-discord' ).'">'.esc_html__( 'Website', 'gf-discord' ).'</a>',
-            'discord' => '<a href="'.esc_url( 'https://discord.gg/3HnzNEJVnR' ).'" target="_blank" aria-label="'.esc_attr__( 'Plugin Support on Discord', 'gf-discord' ).'">'.esc_html__( 'Discord Support', 'gf-discord' ).'</a>'
+            // 'docs'    => '<a href="'.esc_url( 'https://apos37.com/wordpress-addon-for-discord-gravity-forms/' ).'" target="_blank" aria-label="'.esc_attr__( 'Plugin Website Link', 'gf-discord' ).'">'.esc_html__( 'Website', 'gf-discord' ).'</a>',
+            'discord' => '<a href="'.esc_url( GFDISC_DISCORD_SUPPORT_URL ).'" target="_blank" aria-label="'.esc_attr__( 'Plugin Support on Discord', 'gf-discord' ).'">'.esc_html__( 'Discord Support', 'gf-discord' ).'</a>'
         ];
 
         // Require Gravity Forms Notice
