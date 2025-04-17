@@ -3,8 +3,8 @@ Contributors: apos37
 Tags: discord, server, gravity, forms, webhook
 Requires at least: 5.9
 Requires PHP: 7.4
-Tested up to: 6.7
-Stable tag: 1.2
+Tested up to: 6.8
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -72,7 +72,11 @@ function my_gf_discord_embeds( $embeds, $form, $entry ) {
 4. Discord channel post
 
 == Changelog ==
-= 1.2 =
+= 1.2.1 =
+* Update: Updated author name and website again per WordPress trademark policy
+
+= 1.2.0 =
+* Update: Changed author name from Apos37 to WordPress Enhanced, new Author URI
 * Tweak: Optimization
 
 = 1.1.3 =

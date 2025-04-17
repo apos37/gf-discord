@@ -3,12 +3,12 @@
  * Plugin Name:         Add-On for Discord and Gravity Forms
  * Plugin URI:          https://github.com/apos37/gf-discord
  * Description:         Send Gravity Form entries to a Discord channel
- * Version:             1.2
+ * Version:             1.2.1
  * Requires at least:   5.9
- * Tested up to:        6.7
+ * Tested up to:        6.8
  * Requires PHP:        7.4
- * Author:              WordPress Enhanced
- * Author URI:          https://wordpressenhanced.com/
+ * Author:              PluginRx
+ * Author URI:          https://pluginrx.com/
  * Support URI:         https://discord.gg/3HnzNEJVnR
  * Text Domain:         gf-discord
  * License:             GPLv2 or later
