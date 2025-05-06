@@ -65,6 +65,9 @@ function my_gf_discord_embeds( $embeds, $form, $entry ) {
 } // End my_gf_discord_embeds()
 ?>`
 
+== Demo ==
+https://youtu.be/KkT-wd6l7bI
+
 == Screenshots ==
 1. Plugin settings page
 2. Form feed settings page
