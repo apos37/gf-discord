@@ -4,7 +4,7 @@ Tags: discord, server, gravity, forms, webhook
 Requires at least: 5.9
 Requires PHP: 7.4
 Tested up to: 6.8
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -36,7 +36,7 @@ By connecting Gravity Forms and Discord, this add-on simplifies communication, e
 
 == Frequently Asked Questions == 
 = Where can I request features and get further support? =
-Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
+We recommend using our [website support forum](https://pluginrx.com/support/plugin/gf-discord/) as the primary method for requesting features and getting help. You can also reach out via our [Discord support server](https://discord.gg/3HnzNEJVnR) or the [WordPress.org support forum](https://wordpress.org/support/plugin/gf-discord/), but please note that WordPress.org doesn’t always notify us of new posts, so it’s not ideal for time-sensitive issues.
 
 = How can I mention a user or tag a channel in my messages? =
 From the form's Discord feed, you can mention a user with `{{@user_id}}` or a role with `{{@&role_id}}`, and tag a channel with `{{#channel_id}}`. If you're unfamiliar with where to find these IDs, check out [this article](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID) on Discord.
@@ -75,6 +75,9 @@ https://youtu.be/KkT-wd6l7bI
 4. Discord channel post
 
 == Changelog ==
+= 1.3.0 =
+* Update: New support links
+
 = 1.2.1 =
 * Update: Updated author name and website again per WordPress trademark policy
 
